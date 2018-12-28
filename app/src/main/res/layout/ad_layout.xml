@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent" >
+
+    <View
+        android:id="@+id/layout_bgview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" />
+
+    <RelativeLayout
+        android:id="@+id/wm_main_layout"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="96dp"
+        android:background="@drawable/mainbg"
+        android:elevation="2dp">
+
+        <ListView
+            android:id="@+id/adList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"></ListView>
+
+
+     <!--   <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="4dp"
+            android:gravity="left"
+            android:text="APP"
+            android:textColor="@color/priii"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignStart="@+id/textView"
+            android:layout_below="@+id/textView"
+            android:background="@drawable/ber" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_alignTop="@+id/imageView4"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="1"
+            android:gravity="left|center_vertical"
+            android:text="Uber"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="60dp"
+            android:layout_height="28dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/textView"
+            android:layout_marginEnd="19dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/button"
+            android:text="download"
+            android:textColor="@color/white"
+            android:textSize="8dp" />
+
+
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignStart="@+id/imageView4"
+            android:layout_alignTop="@+id/textView3"
+            android:background="@drawable/gojek" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_below="@+id/textView2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="19dp"
+            android:layout_weight="1"
+            android:gravity="left|center"
+            android:text="Gojek"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="60dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="10dp"
+            android:layout_alignStart="@+id/button"
+            android:layout_alignTop="@+id/textView3"
+            android:background="@drawable/button"
+            android:text="download"
+            android:textSize="8dp"
+            android:textColor="@color/white" />-->
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>
