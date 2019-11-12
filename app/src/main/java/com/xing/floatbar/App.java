@@ -9,7 +9,6 @@ import android.hardware.camera2.CameraManager;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import com.tencent.bugly.Bugly;
-import com.zcoup.base.core.ZcoupSDK;
 
 import static android.content.Intent.ACTION_CONFIGURATION_CHANGED;
 
@@ -38,7 +37,6 @@ public class App extends Application {
         registerScreenReceiver();
         registerBlueReceiver();
         registerWifiReceiver();
-        ZcoupSDK.initialize(getApplicationContext(), slotIDBanner);
     }
 
 

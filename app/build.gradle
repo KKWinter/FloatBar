@@ -50,5 +50,4 @@ dependencies {
     implementation 'com.zyao89:zloading:1.0.11'
     implementation 'com.facebook.fresco:fresco:1.10.0'
     implementation 'com.tencent.bugly:crashreport:2.6.6.1'
-    implementation files('libs/zcoup_base_1.0.0.jar')
 }

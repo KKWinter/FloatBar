@@ -14,16 +14,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.zcoup.base.callback.AdEventListener;
-import com.zcoup.base.core.ZCNative;
-import com.zcoup.base.core.ZcoupSDK;
-import com.zcoup.base.enums.AdSize;
-import com.zcoup.base.vo.AdsNativeVO;
-
 import static com.xing.floatbar.SettingActivity.KEY_DISPLAY;
 
 public class MainActivity extends AppCompatActivity
-    implements ActivityCompat.OnRequestPermissionsResultCallback {
+        implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     public static int FLOATING_WINDOW_CODE = 100;
 
@@ -37,7 +31,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         View viewById = findViewById(R.id.setting);
-        sp = getSharedPreferences("setting",Context.MODE_PRIVATE);
+        sp = getSharedPreferences("setting", Context.MODE_PRIVATE);
         viewById.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -61,7 +55,6 @@ public class MainActivity extends AppCompatActivity
         });
 
         rl_container = findViewById(R.id.rl_container);
-        loadBanner();
     }
 
 
@@ -77,7 +70,7 @@ public class MainActivity extends AppCompatActivity
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setCancelable(false);
                 builder.setMessage(
-                    "Please jump to system settings and activate window display function.");
+                        "Please jump to system settings and activate window display function.");
                 builder.setPositiveButton("jump", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -105,53 +98,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-
-
-    private void loadBanner() {
-
-        ZcoupSDK.getBannerAd(MainActivity.this.getApplicationContext(), App.slotIDBanner, AdSize.AD_SIZE_320X50,
-                new AdEventListener() {
-
-                    @Override
-                    public void onReceiveAdSucceed(ZCNative result) {
-                        if (result != null) {
-                            rl_container.addView(result);
-                        }
-
-                    }
-
-                    @Override
-                    public void onReceiveAdVoSucceed(AdsNativeVO adsNativeVO) {
-
-                    }
-
-                    @Override
-                    public void onInterstitialLoadSucceed(ZCNative zcNative) {
-
-                    }
-
-
-                    @Override
-                    public void onReceiveAdFailed(com.zcoup.base.core.ZCNative result) {
-                    }
-
-                    @Override
-                    public void onLandpageShown(ZCNative zcNative) {
-
-                    }
-
-
-                    @Override
-                    public void onAdClicked(com.zcoup.base.core.ZCNative result) {
-                    }
-
-
-                    @Override
-                    public void onAdClosed(com.zcoup.base.core.ZCNative result) {
-                    }
-                });
     }
 
 }
