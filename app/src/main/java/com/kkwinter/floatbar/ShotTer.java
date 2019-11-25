@@ -24,9 +24,6 @@ import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
 
-/**
- * Created by jiantao.tu on 2018/9/20.
- */
 public class ShotTer {
 
     private final SoftReference<Context> mRefContext;

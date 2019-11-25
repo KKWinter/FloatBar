@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,17 +14,12 @@ import android.view.MotionEvent;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 
-import com.tencent.bugly.crashreport.BuglyLog;
+import com.kkwinter.floatbar.utils.ContextUtil;
+import com.kkwinter.floatbar.utils.Preference;
 
-import static com.kkwinter.floatbar.SettingActivity.KEY_DISPLAY;
-
-/**
- * Created by jiantao.tu on 2018/9/19.
- */
 @SuppressLint("ViewConstructor")
 public class TouchView extends android.support.v7.widget.AppCompatButton {
 
-    private SharedPreferences sp;
     private double stateHeight;
     private float startX = 0, startY = 0;
     private float startRawX = 0, startRawY = 0;
@@ -57,7 +51,7 @@ public class TouchView extends android.support.v7.widget.AppCompatButton {
     private Paint mPaint;
 
 
-    public TouchView(Context context, WindowManager windowManager, final WindowManager.LayoutParams layoutParams) {
+    public TouchView(Context context, WindowManager windowManager, WindowManager.LayoutParams layoutParams) {
         super(context);
         this.mWindowManager = windowManager;
         this.mLayoutParams = layoutParams;
@@ -69,25 +63,17 @@ public class TouchView extends android.support.v7.widget.AppCompatButton {
         iconViewY = ICON_PADDING;
         mPaint = new Paint();
 
-        sp = getContext().getSharedPreferences("setting", Context.MODE_PRIVATE);
         startAlphaAnim(5000);
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        BuglyLog.i("Log", "onLayout height=" + getHeight() + ",width=" + getWidth());
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        BuglyLog.i("Log", "onMeasure isDown=" + isDown);
-//        if (isDown) {
-//            setMeasuredDimension(ICON_WIDTH_DOWN, ICON_HEIGHT_DOWN);
-//        } else {
         setMeasuredDimension(ICON_WIDTH, ICON_HEIGHT);
-//        }
-
     }
 
     @Override
@@ -99,8 +85,6 @@ public class TouchView extends android.support.v7.widget.AppCompatButton {
     public boolean onTouchEvent(MotionEvent event) {
         // 获取相对屏幕的坐标，即以屏幕左上角为原点
         float rawX = event.getRawX();
-        // 为状态栏高度 Math.ceil(25
-        // * context.getResources().getDisplayMetrics().density))
         float rawY = (float) (event.getRawY() - stateHeight);
         int sumX = (int) (rawX - startRawX);
         int sumY = (int) (event.getRawY() - startRawY);
@@ -270,7 +254,7 @@ public class TouchView extends android.support.v7.widget.AppCompatButton {
     }
 
     private boolean isDisplay() {
-        return sp.getBoolean(KEY_DISPLAY, true);
+        return Preference.getBoolean(ContextUtil.getAppContext(), Preference.KEY_DISPLAY);
     }
 
 

@@ -3,9 +3,12 @@ package com.kkwinter.floatbar;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -108,5 +111,101 @@ public class Utils {
         window.setStatusBarColor(Color.TRANSPARENT);
 
     }
+
+
+
+
+
+    /**
+     * 物理返回键
+     */
+
+    /**
+     * 物理home键
+     */
+
+    /**
+     * 电源键【锁屏】
+     */
+
+    /**
+     * 打开相机
+     */
+
+    /**
+     * 截屏
+     */
+
+    /**
+     * 手电筒
+     */
+
+    /**
+     * isWifiOn: return获取的wifi的状态，true开启，false关闭
+     * changeWifiStatus： return改变之后的结果
+     */
+    public static boolean isWifiOn(Context context) {
+
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        /*
+         {@link #WIFI_STATE_DISABLED},   1
+         {@link #WIFI_STATE_DISABLING},  0
+         {@link #WIFI_STATE_ENABLED},    3
+         {@link #WIFI_STATE_ENABLING},   2
+         {@link #WIFI_STATE_UNKNOWN}     4
+         */
+        return wifiManager.getWifiState() == 3;
+    }
+
+    public static boolean changeWifiStatus(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        /*
+         android Q上被废弃
+         */
+        boolean result = wifiManager.getWifiState() == 3;
+        wifiManager.setWifiEnabled(!result);
+        return !result;
+    }
+
+
+    /**
+     * 蓝牙
+     */
+    public static boolean isBlueToothOn() {
+        BluetoothAdapter defaultAdapter = BluetoothAdapter.getDefaultAdapter();
+        return defaultAdapter.isEnabled();
+    }
+
+    public static boolean changeBlueToothOnStatus() {
+        BluetoothAdapter defaultAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (isBlueToothOn()) {
+            defaultAdapter.disable();
+            return false;
+        } else {
+            defaultAdapter.enable();
+            return true;
+        }
+    }
+
+
+    /**
+     * 飞行模式
+     */
+    public static boolean isAirPlaneOn(Context context) {
+        return Settings.System.getInt(context.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) == 1;
+    }
+
+
+    public static void changeAirPlaneStatus(Context context) {
+        Intent intent = new Intent("android.settings.AIRPLANE_MODE_SETTINGS");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+
+
+
+
 
 }

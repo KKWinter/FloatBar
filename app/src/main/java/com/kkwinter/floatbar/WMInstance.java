@@ -1,7 +1,6 @@
 package com.kkwinter.floatbar;
 
 import android.accessibilityservice.AccessibilityService;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.admin.DevicePolicyManager;
@@ -10,10 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
@@ -28,47 +24,42 @@ import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.util.Objects;
+import com.kkwinter.floatbar.receiver.BlueChangeBroadcastReceiver;
+import com.kkwinter.floatbar.receiver.PowerAdminReceiver;
+import com.kkwinter.floatbar.receiver.WifiChangeBroadcastReceiver;
+import com.kkwinter.floatbar.utils.ContextUtil;
+import com.kkwinter.floatbar.utils.Preference;
 
-import static com.kkwinter.floatbar.SettingActivity.KEY_DISPLAY;
+import java.util.Objects;
 
 public class WMInstance {
 
-    private SharedPreferences sp;
-    WindowManager windowManager;
+    private WindowManager windowManager;
     private WindowManager.LayoutParams layoutParams;
     private DevicePolicyManager devicePolicyManager;
 
-    @SuppressLint("StaticFieldLeak")
+    private Context context;
     private static WMInstance wmInstance;
+
     private TouchView touchView;
     private View mainView;
-    View adView;
-    private BluetoothAdapter defaultAdapter;
-
-    private WifiManager wifiManager;
-
     private ViewHolder viewHolder;
 
-    private Boolean isTurnOn;
 
     boolean isShowMainView;
+    public boolean isShowIconView;
 
-    boolean isShowIconView;
-
-    private Context context;
+    private BluetoothAdapter defaultAdapter;
+    private WifiManager wifiManager;
+    private Boolean isTurnOn;
     private CameraManager camManager;// 声明CameraManager对象
     private ABCService mAbService;
     private boolean isBackCameraOpen = false;
 
-    private WifiChangeBroadcastReceiver wifiChangeBroadcastReceiver;
-
-    private BlueChangeBroadcastReceiver blueChangeBroadcastReceiver;
 
     CameraManager.AvailabilityCallback availabilityCallback = new CameraManager.AvailabilityCallback() {
         @Override
@@ -118,72 +109,57 @@ public class WMInstance {
         }
     };
 
+
+    public static WMInstance getInstance() {
+        if (wmInstance == null) {
+            wmInstance = new WMInstance();
+        }
+        return wmInstance;
+    }
+
     private WMInstance() {
+        this.context = ContextUtil.getAppContext();
+        isTurnOn = false;
+        isShowIconView = false;
 
-        ABServiceListener abServiceListener = new ABServiceListener() {
-
+        ABCService.setABServiceListener(new ABServiceListener() {
             @Override
             public void onCreate(AccessibilityService abService) {
                 mAbService = (ABCService) abService;
             }
 
-        };
-        ABCService.setABServiceListener(abServiceListener);
-        this.context = App.getApp();
-        isTurnOn = false;
-        isShowIconView = false;
-        devicePolicyManager = (DevicePolicyManager) context.getSystemService(
-                Activity.DEVICE_POLICY_SERVICE);
-        wifiManager = (WifiManager) context.getApplicationContext()
-                .getSystemService(Context.WIFI_SERVICE);
+        });
+
+        devicePolicyManager = (DevicePolicyManager) context.getSystemService(Activity.DEVICE_POLICY_SERVICE);
+        wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         defaultAdapter = BluetoothAdapter.getDefaultAdapter();
         camManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         if (camManager != null) {
             camManager.registerAvailabilityCallback(availabilityCallback, App.HANDLER);
             camManager.registerTorchCallback(torchCallback, App.HANDLER);
         }
-
-        wifiChangeBroadcastReceiver = App.getApp().wifiChangeBroadcastReceiver;
-        blueChangeBroadcastReceiver = App.getApp().blueChangeBroadcastReceiver;
-        wifiChangeBroadcastReceiver.setListener(new SwitchListener() {
-            @Override
-            public void change(boolean enabled) {
-                if (isShowMainView) {
-                    if (enabled) {
-                        viewHolder.itemWifi.setImageResource(R.drawable.wifi);
-                    } else {
-                        viewHolder.itemWifi.setImageResource(R.drawable.wifi_close);
-                    }
-                }
-            }
-        });
-
-        blueChangeBroadcastReceiver.setListener(new SwitchListener() {
-            @Override
-            public void change(boolean enabled) {
-                if (isShowMainView) {
-                    if (enabled) {
-                        viewHolder.itemBluetooth.setImageResource(R.drawable.bluetooth);
-                    } else {
-                        viewHolder.itemBluetooth.setImageResource(R.drawable.bluetooth_close);
-                    }
-                }
-            }
-        });
         createWM();
-        sp = context.getSharedPreferences("setting", Context.MODE_PRIVATE);
     }
 
 
+    private void createWM() {
+        windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        layoutParams = new WindowManager.LayoutParams();
+        layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+        layoutParams.format = PixelFormat.TRANSLUCENT;
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+    }
+
+
+    //弹出圆球悬浮窗
     public void showIconView() {
         if (!isShowIconView) {
             addIconView();
         }
     }
 
-
+    //关闭圆球悬浮窗
     public void disableIconView() {
-
         if (isShowIconView) {
             windowManager.removeView(wmInstance.touchView);
             isShowIconView = false;
@@ -197,74 +173,64 @@ public class WMInstance {
 
     }
 
-
-    /**
-     * @return WMInstance
-     * @Title: getInstance
-     * @Description: TODO
-     */
-    public static WMInstance getInstance() {
-        if (wmInstance == null) {
-            wmInstance = new WMInstance();
-        }
-        return wmInstance;
-    }
-
-
-    public static void launchAppDetail(Context context, String appPkg) {
-
-        final String GOOGLE_PLAY = "com.android.vending";//这里对应的是谷歌商店，跳转别的商店改成对应的即可
+    //添加圆球悬浮窗
+    private void addIconView() {
+        if (!isDisplay()) return;
         try {
-            if (TextUtils.isEmpty(appPkg)) {
-                return;
+            if (mainView != null && windowManager != null) {
+                try {
+                    windowManager.removeView(mainView);
+                    isShowMainView = false;
+                } catch (Exception ignore) {
+                }
             }
-            Uri uri = Uri.parse("market://details?id=" + appPkg);
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            intent.setPackage(GOOGLE_PLAY);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
+            if (touchView == null) {
+                touchView = new TouchView(context, windowManager, layoutParams);
+                touchView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addMainView();
+                    }
+                });
+            }
+
+            layoutParams.x = touchView.getIconViewX();
+            layoutParams.y = touchView.getIconViewY();
+            layoutParams.width = TouchView.ICON_WIDTH;
+            layoutParams.height = TouchView.ICON_HEIGHT;
+            layoutParams.gravity = Gravity.START | Gravity.TOP;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+            } else {
+                layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+            }
+            if (windowManager != null) windowManager.addView(touchView, layoutParams);
+
+            isShowIconView = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
-    private void createWM() {
-        windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        layoutParams = new WindowManager.LayoutParams();
-        layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-        layoutParams.format = PixelFormat.TRANSLUCENT;
-        layoutParams.flags = WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES |
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+    private boolean isDisplay() {
+        return Preference.getBoolean(ContextUtil.getAppContext(), Preference.KEY_DISPLAY);
     }
 
 
     private class ViewHolder {
         private View bgView;
         private ImageView itemCancel;
-        private ImageView itemPhone;
-        private ImageView itemHome;
+        private ImageView itemPhoto;
         private ImageView itemPower;
-        private ImageView itemCar;
-        private ImageView itemHotel;
-        private ImageView itemLunch;
-        private ImageView itemAirport;
 
-        private ImageView itemBluetooth;
-
-        private ImageView itemAirplane;
-
-        private ImageView itemWifi;
-
+        private ImageView itemHome;
+        private ImageView itemScreenshot;
         private ImageView itemFlashLight;
 
-        private ImageView itemScreenshot;
-    }
-
-
-    private static boolean isAirModeOn(Context context) {
-        return Settings.System.getInt(context.getContentResolver(),
-                Settings.Global.AIRPLANE_MODE_ON, 0) == 1;
+        private ImageView itemWifi;
+        private ImageView itemBluetooth;
+        private ImageView itemAirplane;
     }
 
 
@@ -282,14 +248,7 @@ public class WMInstance {
             }
 
             initMainView();
-//            if (wmBottom != null) {
-//                if (App.getApp().getResources().getConfiguration().orientation ==
-//                        Configuration.ORIENTATION_LANDSCAPE) {
-//                    wmBottom.setVisibility(View.GONE);
-//                } else {
-//                    wmBottom.setVisibility(View.VISIBLE);
-//                }
-//            }
+
             layoutParams.alpha = 1f;
             layoutParams.x = 0;
             layoutParams.y = 0;
@@ -311,38 +270,106 @@ public class WMInstance {
     }
 
 
-    private Drawable getBG() {
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setCornerRadius(Utils.dp2px(15));
-        drawable.setColor(0xCC171b19);
-        drawable.setShape(GradientDrawable.RECTANGLE);
-        return drawable;
-    }
-
-    ViewGroup wmBottom;
-
     private void initMainView() {
         if (mainView == null) {
             mainView = LayoutInflater.from(context).inflate(R.layout.wm_main_layout, null);
             viewHolder = new ViewHolder();
             viewHolder.bgView = mainView.findViewById(R.id.wm_main_bgview);
+
             viewHolder.itemCancel = mainView.findViewById(R.id.wm_item_cancel);
-            viewHolder.itemPhone = mainView.findViewById(R.id.wm_item_phone);
-            viewHolder.itemHome = mainView.findViewById(R.id.wm_item_home);
+            viewHolder.itemPhoto = mainView.findViewById(R.id.wm_item_photo);
             viewHolder.itemPower = mainView.findViewById(R.id.wm_item_power);
+
+            viewHolder.itemHome = mainView.findViewById(R.id.wm_item_home);
+            viewHolder.itemScreenshot = mainView.findViewById(R.id.wm_item_screenshot);
+            viewHolder.itemFlashLight = mainView.findViewById(R.id.wm_item_flashlight);
+
             viewHolder.itemWifi = mainView.findViewById(R.id.wm_item_wifi);
             viewHolder.itemBluetooth = mainView.findViewById(R.id.wm_item_bluetooth);
             viewHolder.itemAirplane = mainView.findViewById(R.id.wm_item_airplane);
-            viewHolder.itemFlashLight = mainView.findViewById(R.id.wm_item_flashlight);
-            viewHolder.itemScreenshot = mainView.findViewById(R.id.wm_item_screenshot);
-            viewHolder.itemCar = mainView.findViewById(R.id.wm_item_car);
-            viewHolder.itemHotel = mainView.findViewById(R.id.wm_item_hotel);
-            viewHolder.itemLunch = mainView.findViewById(R.id.wm_item_lunch);
-            viewHolder.itemAirport = mainView.findViewById(R.id.wm_item_airport);
-            View wmTop = mainView.findViewById(R.id.wm_top);
-            wmBottom = mainView.findViewById(R.id.wm_bottom);
-            wmTop.setBackground(getBG());
-            wmBottom.setBackground(getBG());
+
+
+
+//            viewHolder.bgView.setOnClickListener(new View.OnClickListener() {
+//
+//                @Override
+//                public void onClick(View v) {
+//
+//                    addIconView();
+//                }
+//            });
+
+            viewHolder.itemCancel.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    cancelClick();
+
+                }
+            });
+
+            viewHolder.itemPhoto.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    phoneClick();
+                }
+            });
+
+
+            viewHolder.itemPower.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    powerClick();
+                }
+            });
+
+
+            viewHolder.itemHome.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+
+                    homeClick();
+                }
+            });
+
+            viewHolder.itemScreenshot.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    screenShotClick();
+                }
+
+            });
+
+
+
+            viewHolder.itemFlashLight.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    flashLightClick();
+                }
+            });
+
+
+
+            viewHolder.itemWifi.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+
+                    Toast.makeText(context, "wifi change", Toast.LENGTH_SHORT).show();
+                    
+//                    viewHolder.itemWifi.setImageResource(Utils.changeWifiStatus(context) ? R.drawable.wifi : R.drawable.wifi_close);
+
+                    Utils.changeWifiStatus(context);
+
+//                    viewHolder.itemWifi.setImageResource(R.drawable.wifi);
+
+                }
+            });
 
             viewHolder.itemBluetooth.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -359,119 +386,27 @@ public class WMInstance {
                 }
             });
 
-            viewHolder.itemHotel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    hotelClick();
-                }
-            });
 
-            viewHolder.itemAirport.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    airportClick();
-                }
-            });
 
-            viewHolder.itemLunch.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
 
-                    lunchClick();
-                }
 
-            });
 
-            viewHolder.itemCar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
 
-                    carClick();
-                }
-            });
 
-            viewHolder.bgView.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
 
-                    addIconView();
-                }
-            });
 
-            viewHolder.itemCancel.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-                    cancelClick();
 
-                }
-            });
-
-            viewHolder.itemWifi.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    wifiClick();
-                }
-            });
-            viewHolder.itemPhone.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    phoneClick();
-                }
-            });
-            viewHolder.itemHome.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-
-                    homeClick();
-                }
-            });
-            viewHolder.itemPower.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    powerClick();
-                }
-            });
-
-            viewHolder.itemFlashLight.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    flashLightClick();
-                }
-            });
-
-            viewHolder.itemScreenshot.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    screenShotClick();
-                }
-
-            });
         }
 
-        int wifiState = wifiManager.getWifiState();
-        if (wifiState == 1) {
-            viewHolder.itemWifi.setImageResource(R.drawable.wifi_close);
-        } else if (wifiState == 3) {
-            viewHolder.itemWifi.setImageResource(R.drawable.wifi);
-        }
 
-        if (defaultAdapter.isEnabled()) {
-            viewHolder.itemBluetooth.setImageResource(R.drawable.bluetooth);
-        } else {
-            viewHolder.itemBluetooth.setImageResource(R.drawable.bluetooth_close);
-        }
+        viewHolder.itemWifi.setImageResource(Utils.isWifiOn(context) ? R.drawable.wifi : R.drawable.wifi_close);
 
-        if (isAirModeOn(context)) {
-            viewHolder.itemAirplane.setImageResource(R.drawable.airplane);
-        } else {
-            viewHolder.itemAirplane.setImageResource(R.drawable.airplane_close);
-        }
+        viewHolder.itemBluetooth.setImageResource(Utils.isBlueToothOn() ? R.drawable.bluetooth : R.drawable.bluetooth_close);
+
+        viewHolder.itemAirplane.setImageResource(Utils.isAirPlaneOn(context) ? R.drawable.airplane : R.drawable.airplane_close);
+
 
         if (isTurnOn) {
             viewHolder.itemFlashLight.setImageResource(R.drawable.flashlight);
@@ -484,8 +419,7 @@ public class WMInstance {
 
     private boolean isBackCameraAndFlash(String camId) {
         try {
-            CameraCharacteristics characteristics = Objects.requireNonNull(camManager)
-                    .getCameraCharacteristics(camId);
+            CameraCharacteristics characteristics = Objects.requireNonNull(camManager).getCameraCharacteristics(camId);
             Boolean hasFlash = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
             Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
             Boolean isFacingBack = facing != null &&
@@ -585,6 +519,13 @@ public class WMInstance {
 
 
     private void wifiClick() {
+
+
+       boolean change =  Utils.changeWifiStatus(context);
+
+
+
+
         int wifiState = wifiManager.getWifiState();
 
         if (wifiState == 1) {
@@ -631,158 +572,6 @@ public class WMInstance {
         }
         if (mAbService != null) {
             mAbService.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
-        }
-    }
-
-
-    private void carClick() {
-        if (!isDisplay()) return;
-        addIconView();
-
-        layoutParams.alpha = 1f;
-        layoutParams.x = 0;
-        layoutParams.y = 0;
-        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
-        layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
-        layoutParams.gravity = Gravity.START | Gravity.TOP;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-
-            layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-        }
-
-        final View view1 = LayoutInflater.from(context).inflate(R.layout.waiting, null);
-
-        View hideView = view1.findViewById(R.id.layout_hide);
-
-        hideView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                windowManager.removeView(view1);
-
-            }
-        });
-
-        windowManager.addView(view1, layoutParams);
-
-        adView = LayoutInflater.from(context).inflate(R.layout.ad_layout, null);
-
-    }
-
-
-    private void lunchClick() {
-        if (!isDisplay()) return;
-        addIconView();
-
-        layoutParams.alpha = 1f;
-        layoutParams.x = 0;
-        layoutParams.y = 0;
-        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
-        layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
-        layoutParams.gravity = Gravity.START | Gravity.TOP;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-
-            layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-        }
-
-        final View view1 = LayoutInflater.from(context).inflate(R.layout.waiting, null);
-
-        View hideView = view1.findViewById(R.id.layout_hide);
-
-        hideView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                windowManager.removeView(view1);
-
-            }
-        });
-
-        windowManager.addView(view1, layoutParams);
-
-        adView = LayoutInflater.from(context).inflate(R.layout.ad_layout, null);
-
-    }
-
-
-    private void airportClick() {
-        if (!isDisplay()) return;
-        addIconView();
-
-        layoutParams.alpha = 1f;
-        layoutParams.x = 0;
-        layoutParams.y = 0;
-        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
-        layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
-        layoutParams.gravity = Gravity.START | Gravity.TOP;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-
-            layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-        }
-
-        final View view1 = LayoutInflater.from(context).inflate(R.layout.waiting, null);
-
-        View hideView = view1.findViewById(R.id.layout_hide);
-
-        hideView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                windowManager.removeView(view1);
-
-            }
-        });
-
-        windowManager.addView(view1, layoutParams);
-
-        adView = LayoutInflater.from(context).inflate(R.layout.ad_layout, null);
-
-    }
-
-
-    private void hotelClick() {
-        if (!isDisplay()) return;
-        addIconView();
-
-        layoutParams.alpha = 1f;
-        layoutParams.x = 0;
-        layoutParams.y = 0;
-        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
-        layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
-        layoutParams.gravity = Gravity.START | Gravity.TOP;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-            layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-        }
-
-        final View view1 = LayoutInflater.from(context).inflate(R.layout.waiting, null);
-
-        View hideView = view1.findViewById(R.id.layout_hide);
-
-        hideView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                windowManager.removeView(view1);
-
-            }
-        });
-
-        windowManager.addView(view1, layoutParams);
-
-        if (adView == null) {
-            adView = LayoutInflater.from(context).inflate(R.layout.ad_layout, null);
         }
     }
 
@@ -836,47 +625,10 @@ public class WMInstance {
     }
 
 
-    private void addIconView() {
-        if (!isDisplay()) return;
-        try {
-            if (mainView != null && windowManager != null) {
-                try {
-                    windowManager.removeView(mainView);
-                    isShowMainView = false;
-                } catch (Exception ignore) {
-                }
-            }
-            if (touchView == null) {
-                touchView = new TouchView(context, windowManager, layoutParams);
-                touchView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        addMainView();
-                    }
-                });
-            }
-
-            layoutParams.x = touchView.getIconViewX();
-            layoutParams.y = touchView.getIconViewY();
-            layoutParams.width = TouchView.ICON_WIDTH;
-            layoutParams.height = TouchView.ICON_HEIGHT;
-            layoutParams.gravity = Gravity.START | Gravity.TOP;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-            } else {
-                layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-            }
-            if (windowManager != null) windowManager.addView(touchView, layoutParams);
-
-            isShowIconView = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private static boolean isAirModeOn(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.Global.AIRPLANE_MODE_ON, 0) == 1;
     }
 
-
-    private boolean isDisplay() {
-        return sp.getBoolean(KEY_DISPLAY, true);
-    }
 
 }

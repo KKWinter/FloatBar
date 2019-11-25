@@ -9,11 +9,13 @@
  * @date: 2014年9月12日 上午10:45:04
  * @version: V1.0
  */
-package com.kkwinter.floatbar;
+package com.kkwinter.floatbar.receiver;
 
 import android.app.admin.DeviceAdminReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import com.kkwinter.floatbar.YeLog;
 
 
 public class PowerAdminReceiver extends DeviceAdminReceiver {

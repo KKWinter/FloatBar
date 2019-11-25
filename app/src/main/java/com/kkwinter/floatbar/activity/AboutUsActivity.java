@@ -1,7 +1,9 @@
-package com.kkwinter.floatbar;
+package com.kkwinter.floatbar.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+
+import com.kkwinter.floatbar.R;
 
 public class AboutUsActivity extends Activity {
 

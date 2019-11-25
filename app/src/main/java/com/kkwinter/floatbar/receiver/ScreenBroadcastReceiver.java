@@ -1,14 +1,14 @@
-package com.kkwinter.floatbar;
+package com.kkwinter.floatbar.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 
-/**
- * Created by Vincent
- * Email:jingwei.zhang@yeahmobi.com
- */
+import com.kkwinter.floatbar.App;
+import com.kkwinter.floatbar.WMInstance;
+import com.kkwinter.floatbar.YeLog;
+
 public class ScreenBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {

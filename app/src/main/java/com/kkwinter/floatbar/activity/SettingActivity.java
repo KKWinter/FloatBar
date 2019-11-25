@@ -1,26 +1,23 @@
-package com.kkwinter.floatbar;
+package com.kkwinter.floatbar.activity;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
-public class SettingActivity extends Activity {
+import com.kkwinter.floatbar.utils.ContextUtil;
+import com.kkwinter.floatbar.utils.Preference;
+import com.kkwinter.floatbar.R;
+import com.kkwinter.floatbar.WMInstance;
 
-    private SharedPreferences sp;
-    public static final String KEY_DISPLAY = "KEY_DISPLAY";
+public class SettingActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_setting);
 
-        setContentView(R.layout.activity_main2);
-
-        sp = getSharedPreferences("setting", Context.MODE_PRIVATE);
-        boolean display = sp.getBoolean(KEY_DISPLAY, true);
-
+        boolean display = Preference.getBoolean(ContextUtil.getAppContext(), Preference.KEY_DISPLAY);
         final Switch displayControl = findViewById(R.id.s_w);
 
         if (display && WMInstance.getInstance().isShowIconView) {
@@ -35,9 +32,8 @@ public class SettingActivity extends Activity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
                 //控制开关字体颜色
-                SharedPreferences.Editor edit = sp.edit();
-                edit.putBoolean(KEY_DISPLAY, checked);
-                edit.apply();
+                Preference.persistBoolean(ContextUtil.getAppContext(), Preference.KEY_DISPLAY, checked);
+
                 if (checked) {
                     displayControl.setSwitchTextAppearance(SettingActivity.this, R.style.s_true);
                     WMInstance.getInstance().showIconView();

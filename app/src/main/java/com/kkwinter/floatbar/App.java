@@ -8,13 +8,17 @@ import android.content.IntentFilter;
 import android.hardware.camera2.CameraManager;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
-import com.tencent.bugly.Bugly;
+
+import com.kkwinter.floatbar.anr.ANRWatchDog;
+import com.kkwinter.floatbar.receiver.BlueChangeBroadcastReceiver;
+import com.kkwinter.floatbar.receiver.ScreenBroadcastReceiver;
+import com.kkwinter.floatbar.receiver.WifiChangeBroadcastReceiver;
+import com.kkwinter.floatbar.utils.ContextUtil;
 
 import static android.content.Intent.ACTION_CONFIGURATION_CHANGED;
 
 public class App extends Application {
 
-    public static String slotIDBanner = "48447237";
     private static App app;
 
     public static App getApp() {
@@ -22,18 +26,18 @@ public class App extends Application {
     }
 
     public final static Handler HANDLER = new Handler();
-    private ScreenBroadcastReceiver mScreenReceiver;
 
-    WifiChangeBroadcastReceiver wifiChangeBroadcastReceiver;
-
-    BlueChangeBroadcastReceiver blueChangeBroadcastReceiver;
+    public ScreenBroadcastReceiver mScreenReceiver;
+    public WifiChangeBroadcastReceiver wifiChangeBroadcastReceiver;
+    public BlueChangeBroadcastReceiver blueChangeBroadcastReceiver;
 
     @Override
     public void onCreate() {
         super.onCreate();
         app = this;
-        initBugly();
+        ContextUtil.init(this);
         new ANRWatchDog().start();
+
         registerScreenReceiver();
         registerBlueReceiver();
         registerWifiReceiver();
@@ -56,12 +60,6 @@ public class App extends Application {
             camManager.unregisterTorchCallback(WMInstance.getInstance().torchCallback);
         }
     }
-
-
-    private void initBugly() {
-        Bugly.init(this, "2fd4a2fa3b", BuildConfig.DEBUG);
-    }
-
 
     public void registerScreenReceiver() {
         IntentFilter filter = new IntentFilter();

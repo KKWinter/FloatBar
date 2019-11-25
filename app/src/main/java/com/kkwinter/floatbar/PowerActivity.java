@@ -9,9 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.Window;
 
-/**
- * Created by jiantao.tu on 2018/9/21.
- */
 public class PowerActivity extends Activity {
 
     private final static String COMPONENT_KEY = "component_key";

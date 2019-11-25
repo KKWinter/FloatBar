@@ -6,6 +6,7 @@ import android.util.Log;
 @Keep
 public class YeLog {
 
+    public static Boolean LOG = false;   //TODO:  日志开关,一直关着就行
     private final static String TAG = "CT_floatbar_v" + BuildConfig.VERSION_NAME;    //当前版本号
 
     private YeLog() {
@@ -17,53 +18,20 @@ public class YeLog {
     }
 
     public static void dp(String format, String... args) {
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             i(String.format(format, (Object[]) args));
         }
     }
 
 
     public static void ip(String format, String... args) {
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             i(String.format(format, (Object[]) args));
         }
     }
 
-
-    public static void ep(String format, String... args) {
-        if (SwitchConfig.LOG) {
-            e(String.format(format, (Object[]) args));
-        }
-    }
-
-    public static void info(String msg) {
-        if (msg != null) {
-            Log.i(getLogTag(TAG), msg);
-        }
-    }
-
-    public static void info(String tag, String msg) {
-        if (msg != null) {
-            Log.i(getLogTag(tag), msg);
-        }
-    }
-
-    public static void debug(String tag, String msg){
-        if (msg != null){
-            Log.d(getLogTag(tag), msg);
-        }
-    }
-
-    public static void error(String tag, String msg){
-        if (msg != null){
-            Log.e(getLogTag(tag), msg);
-        }
-    }
-
-
-
     public static void i(String msg) {
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             if (msg != null) {
                 Log.i(getLogTag(TAG), msg);
             }
@@ -73,7 +41,7 @@ public class YeLog {
 
     public static void d(String msg) {
 
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             if (msg != null) {
                 Log.d(getLogTag(TAG), msg);
             }
@@ -82,7 +50,7 @@ public class YeLog {
 
     public static void w(String msg) {
 
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             if (msg != null) {
                 Log.w(getLogTag(TAG), msg);
             }
@@ -91,7 +59,7 @@ public class YeLog {
 
 
     public static void w(Exception ex) {
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             if (ex != null) {
                 ex.printStackTrace();
             }
@@ -100,7 +68,7 @@ public class YeLog {
 
 
     public static void e(String msg) {
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             if (msg != null) {
                 Log.e(getLogTag(TAG), msg);
             }
@@ -109,7 +77,7 @@ public class YeLog {
 
 
     public static void i(String tag, String msg) {
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             if (msg != null) {
                 Log.i(getLogTag(tag), msg);
             }
@@ -118,7 +86,7 @@ public class YeLog {
 
 
     public static void d(String tag, String msg) {
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             if (msg != null) {
                 Log.d(getLogTag(tag), msg);
             }
@@ -127,7 +95,7 @@ public class YeLog {
 
 
     public static void w(String tag, String msg) {
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             if (msg != null) {
                 Log.w(getLogTag(tag), msg);
             }
@@ -135,7 +103,7 @@ public class YeLog {
     }
 
     public static void w(String tag, String msg, Throwable tr) {
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             if (msg != null) {
                 Log.w(getLogTag(tag), msg, tr);
             }
@@ -143,14 +111,14 @@ public class YeLog {
     }
 
     public static void e(String tag, String msg) {
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             if (msg != null) {
                 Log.e(getLogTag(tag), msg);
             }
         }
     }
     public static void e(String tag, String msg, Throwable tr) {
-        if (SwitchConfig.LOG) {
+        if (LOG) {
             if (msg != null) {
                 Log.e(getLogTag(tag), msg, tr);
             }
