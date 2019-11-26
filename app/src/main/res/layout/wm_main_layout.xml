@@ -4,6 +4,12 @@
     android:layout_height="match_parent"
     android:background="@android:color/transparent">
 
+    <View
+        android:id="@+id/wm_main_bgview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -124,9 +130,5 @@
 
     </LinearLayout>
 
-    <View
-        android:id="@+id/wm_main_bgview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent" />
+
 </RelativeLayout>

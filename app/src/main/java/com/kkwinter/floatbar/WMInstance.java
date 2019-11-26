@@ -13,14 +13,13 @@ import android.graphics.PixelFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,9 +27,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.kkwinter.floatbar.receiver.BlueChangeBroadcastReceiver;
 import com.kkwinter.floatbar.receiver.PowerAdminReceiver;
-import com.kkwinter.floatbar.receiver.WifiChangeBroadcastReceiver;
 import com.kkwinter.floatbar.utils.ContextUtil;
 import com.kkwinter.floatbar.utils.Preference;
 
@@ -287,118 +284,105 @@ public class WMInstance {
             viewHolder.itemWifi = mainView.findViewById(R.id.wm_item_wifi);
             viewHolder.itemBluetooth = mainView.findViewById(R.id.wm_item_bluetooth);
             viewHolder.itemAirplane = mainView.findViewById(R.id.wm_item_airplane);
-
-
-
-//            viewHolder.bgView.setOnClickListener(new View.OnClickListener() {
-//
-//                @Override
-//                public void onClick(View v) {
-//
-//                    addIconView();
-//                }
-//            });
-
-            viewHolder.itemCancel.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    cancelClick();
-
-                }
-            });
-
-            viewHolder.itemPhoto.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    phoneClick();
-                }
-            });
-
-
-            viewHolder.itemPower.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    powerClick();
-                }
-            });
-
-
-            viewHolder.itemHome.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-
-                    homeClick();
-                }
-            });
-
-            viewHolder.itemScreenshot.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    screenShotClick();
-                }
-
-            });
-
-
-
-            viewHolder.itemFlashLight.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    flashLightClick();
-                }
-            });
-
-
-
-            viewHolder.itemWifi.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-
-                    Toast.makeText(context, "wifi change", Toast.LENGTH_SHORT).show();
-                    
-//                    viewHolder.itemWifi.setImageResource(Utils.changeWifiStatus(context) ? R.drawable.wifi : R.drawable.wifi_close);
-
-                    Utils.changeWifiStatus(context);
-
-//                    viewHolder.itemWifi.setImageResource(R.drawable.wifi);
-
-                }
-            });
-
-            viewHolder.itemBluetooth.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    blueToothClick();
-                }
-            });
-
-            viewHolder.itemAirplane.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    airplaneClick();
-                }
-            });
-
-
-
-
-
-
-
-
-
-
-
-
-
         }
+
+        Log.i("test", "initMainView: >>>>");
+
+        viewHolder.bgView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                Toast.makeText(context, "bgview", Toast.LENGTH_SHORT).show();
+                addIconView();
+            }
+        });
+
+        viewHolder.itemCancel.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                cancelClick();
+
+            }
+        });
+
+        viewHolder.itemPhoto.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                phoneClick();
+            }
+        });
+
+
+        viewHolder.itemPower.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                powerClick();
+            }
+        });
+
+
+        viewHolder.itemHome.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                addIconView();
+                Utils.openHome(context);
+
+            }
+        });
+
+        viewHolder.itemScreenshot.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                screenShotClick();
+            }
+
+        });
+
+
+        viewHolder.itemFlashLight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                flashLightClick();
+            }
+        });
+
+
+        viewHolder.itemWifi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                // TODO: 2019-11-26 会ANR
+                viewHolder.itemWifi.setImageResource(Utils.changeWifiStatus(context) ? R.drawable.wifi : R.drawable.wifi_close);
+
+            }
+        });
+
+        viewHolder.itemBluetooth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                // TODO: 2019-11-26 ANR
+                viewHolder.itemBluetooth.setImageResource(Utils.changeBlueToothStatus() ? R.drawable.bluetooth : R.drawable.bluetooth_close);
+
+            }
+        });
+
+
+        viewHolder.itemAirplane.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                addIconView();
+                Utils.changeAirPlaneStatus(context.getApplicationContext());
+            }
+        });
 
 
         viewHolder.itemWifi.setImageResource(Utils.isWifiOn(context) ? R.drawable.wifi : R.drawable.wifi_close);
@@ -503,42 +487,12 @@ public class WMInstance {
     }
 
 
-    private void homeClick() {
-        addIconView();
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        context.startActivity(intent);
-    }
-
-
     private void phoneClick() {
         addIconView();
         PermissionActivity.launch(PermissionUtils.CODE_CAMERA);
     }
 
 
-    private void wifiClick() {
-
-
-       boolean change =  Utils.changeWifiStatus(context);
-
-
-
-
-        int wifiState = wifiManager.getWifiState();
-
-        if (wifiState == 1) {
-
-            wifiManager.setWifiEnabled(true);
-            viewHolder.itemWifi.setImageResource(R.drawable.wifi);
-
-        } else if (wifiState == 3) {
-            wifiManager.setWifiEnabled(false);
-            viewHolder.itemWifi.setImageResource(R.drawable.wifi_close);
-
-        }
-    }
 
 
     private void cancelClick() {
@@ -576,41 +530,6 @@ public class WMInstance {
     }
 
 
-    void airplaneClick() {
-        if (isShowMainView) {
-            addIconView();
-            Intent intent = new Intent("android.settings.AIRPLANE_MODE_SETTINGS");
-
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-            context.startActivity(intent);
-            //            boolean flag = isAirModeOn(context);
-            //            if (flag) {
-            //                viewHolder.itemAirplane.setImageResource(R.drawable.airplane);
-            //            } else {
-            //                viewHolder.itemAirplane.setImageResource(R.drawable.airplane_close);
-            //            }
-            //            Settings.Global.putInt(context.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, flag ? 1 : 0);
-            //            Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
-            //            intent.putExtra("state", flag);
-            //            context.sendBroadcast(intent);
-        }
-    }
-
-
-    private void blueToothClick() {
-
-        if (defaultAdapter.isEnabled()) {
-            defaultAdapter.disable();
-            viewHolder.itemBluetooth.setImageResource(R.drawable.bluetooth_close);
-        } else {
-
-            defaultAdapter.enable();
-            viewHolder.itemBluetooth.setImageResource(R.drawable.bluetooth);
-        }
-    }
-
-
     /**
      * 手电筒控制方法
      */
@@ -622,12 +541,6 @@ public class WMInstance {
                 e.printStackTrace();
             }
         }
-    }
-
-
-    private static boolean isAirModeOn(Context context) {
-        return Settings.System.getInt(context.getContentResolver(),
-                Settings.Global.AIRPLANE_MODE_ON, 0) == 1;
     }
 
 

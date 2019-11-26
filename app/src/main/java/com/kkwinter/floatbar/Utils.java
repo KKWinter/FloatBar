@@ -12,11 +12,15 @@ import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 
 /**
  * Created by jiantao.tu on 2018/9/20.
@@ -48,7 +52,7 @@ public class Utils {
                     String accessibilityService = mStringColonSplitter.next();
 
                     YeLog.i("Utils-isAccessibilitySettingsOn:-------------- > accessibilityService :: " + accessibilityService + " " +
-                                    service);
+                            service);
                     if (accessibilityService.equalsIgnoreCase(service)) {
                         YeLog.i("Utils-isAccessibilitySettingsOn:We've found the correct setting - accessibility is switched on!");
                         return true;
@@ -113,9 +117,6 @@ public class Utils {
     }
 
 
-
-
-
     /**
      * 物理返回键
      */
@@ -123,6 +124,16 @@ public class Utils {
     /**
      * 物理home键
      */
+    public static void openHome(Context context) {
+        try {
+            Intent home = new Intent(Intent.ACTION_MAIN);
+            home.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            home.addCategory(Intent.CATEGORY_HOME);
+            context.startActivity(home);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 电源键【锁屏】
@@ -170,14 +181,15 @@ public class Utils {
 
 
     /**
-     * 蓝牙
+     * isBlueToothOn: return获取的蓝牙状态，true开启，false关闭
+     * changeBlueToothStatus: return改变之后的结果
      */
     public static boolean isBlueToothOn() {
         BluetoothAdapter defaultAdapter = BluetoothAdapter.getDefaultAdapter();
         return defaultAdapter.isEnabled();
     }
 
-    public static boolean changeBlueToothOnStatus() {
+    public static boolean changeBlueToothStatus() {
         BluetoothAdapter defaultAdapter = BluetoothAdapter.getDefaultAdapter();
         if (isBlueToothOn()) {
             defaultAdapter.disable();
@@ -198,14 +210,11 @@ public class Utils {
 
 
     public static void changeAirPlaneStatus(Context context) {
+        //在后台startActivity无效
         Intent intent = new Intent("android.settings.AIRPLANE_MODE_SETTINGS");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
-
-
-
-
 
 
 }

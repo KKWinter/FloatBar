@@ -88,7 +88,6 @@ public class PermissionActivity extends Activity implements ActivityCompat.OnReq
                     overridePendingTransition(0, 0);
                     break;
                 case PermissionUtils.CODE_PERMISSION_WRITE_SECURE_SETTINGS:
-                    WMInstance.getInstance().airplaneClick();
                     break;
                 default:
                     break;
