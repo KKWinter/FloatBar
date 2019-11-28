@@ -5,22 +5,23 @@ android {
     compileSdkVersion 28
     signingConfigs {
         sign_config {
-            keyAlias properties.getProperty("keyAlias")
-            keyPassword properties.getProperty("keyPassword")
-            storeFile file(properties.getProperty("storeFile"))
-            storePassword properties.getProperty("storePassword")
+            keyAlias 'winter'
+            keyPassword 'winter'
+            storeFile file('../winter')
+            storePassword 'winter'
         }
     }
     defaultConfig {
         applicationId "com.kkwinter.floatbar"
         minSdkVersion 28
         targetSdkVersion 28
-        versionCode 3
-        versionName "1.1.0"
+        versionCode 1
+        versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         renderscriptTargetApi 27
         renderscriptSupportModeEnabled true
     }
+
     buildTypes {
         release {
             minifyEnabled true
