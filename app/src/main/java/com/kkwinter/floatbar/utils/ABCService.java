@@ -1,6 +1,7 @@
-package com.kkwinter.floatbar;
+package com.kkwinter.floatbar.utils;
 
 import android.accessibilityservice.AccessibilityService;
+import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
 public class ABCService extends AccessibilityService {
@@ -14,6 +15,7 @@ public class ABCService extends AccessibilityService {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.i("test", "onCreate: >>");
         if (mABServiceListener != null) {
             mABServiceListener.onCreate(this);
         }

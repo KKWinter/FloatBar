@@ -1,4 +1,4 @@
-package com.kkwinter.floatbar;
+package com.kkwinter.floatbar.utils;
 
 import android.accessibilityservice.AccessibilityService;
 

@@ -1,4 +1,4 @@
-package com.kkwinter.floatbar;
+package com.kkwinter.floatbar.utils;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,17 +11,14 @@ import android.support.v4.app.ActivityCompat;
 import android.view.Window;
 import android.widget.Toast;
 
-/**
- * Created by jiantao.tu on 2018/9/21.
- */
-public class PermissionActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
+import com.kkwinter.floatbar.App;
 
+public class PermissionActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     public final static String PERMISSION_KEY = "PERMISSION_KEY";
 
-
     public static void launch(int permissionCode) {
-        Intent intent = new Intent("com.xing.floatbar.PermissionActivity");
+        Intent intent = new Intent("com.PermissionActivity");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra(PERMISSION_KEY, permissionCode);
         App.getApp().startActivity(intent);
@@ -83,9 +80,6 @@ public class PermissionActivity extends Activity implements ActivityCompat.OnReq
                     Toast.makeText(App.getApp(), "Result Permission Grant CODE_READ_EXTERNAL_STORAGE", Toast.LENGTH_SHORT).show();
                     break;
                 case PermissionUtils.CODE_WRITE_EXTERNAL_STORAGE:
-                    intent = new Intent(PermissionActivity.this, ScreenShotActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(0, 0);
                     break;
                 case PermissionUtils.CODE_PERMISSION_WRITE_SECURE_SETTINGS:
                     break;

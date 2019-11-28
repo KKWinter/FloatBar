@@ -1,4 +1,4 @@
-package com.kkwinter.floatbar;
+package com.kkwinter.floatbar.utils;
 
 import android.Manifest;
 import android.app.Activity;
@@ -15,6 +15,8 @@ import android.support.v7.app.AlertDialog;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.kkwinter.floatbar.R;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,9 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Created by jiantao.tu on 2018/9/20.
- */
 public class PermissionUtils {
 
     private static final String TAG = PermissionUtils.class.getSimpleName() + ":";
@@ -79,8 +78,7 @@ public class PermissionUtils {
      * @param activity
      * @param requestCode request code, e.g. if you need request CAMERA permission,parameters is PermissionUtils.CODE_CAMERA
      */
-    public static void requestPermission(final Activity activity, final int requestCode, PermissionGrant permissionGrant, PermissionOver
-            permissionOver) {
+    public static void requestPermission(final Activity activity, final int requestCode, PermissionGrant permissionGrant, PermissionOver permissionOver) {
         if (activity == null) {
             return;
         }
@@ -129,8 +127,7 @@ public class PermissionUtils {
         }
     }
 
-    private static void requestMultiResult(Activity activity, String[] permissions, int[] grantResults, PermissionGrant permissionGrant,
-                                           PermissionOver permissionOver) {
+    private static void requestMultiResult(Activity activity, String[] permissions, int[] grantResults, PermissionGrant permissionGrant, PermissionOver permissionOver) {
 
         if (activity == null) {
             return;

@@ -1,38 +1,37 @@
 package com.kkwinter.floatbar.activity;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.kkwinter.floatbar.App;
 import com.kkwinter.floatbar.utils.ContextUtil;
 import com.kkwinter.floatbar.utils.Preference;
 import com.kkwinter.floatbar.R;
 import com.kkwinter.floatbar.WMInstance;
-import com.kkwinter.floatbar.YeLog;
 
-public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class MainActivity extends Activity {
+
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = ContextUtil.getAppContext();
 
         View viewById = findViewById(R.id.setting);
-
         viewById.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 Intent intent = new Intent("com.setting");
                 startActivity(intent);
-
             }
         });
 
@@ -43,18 +42,18 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
                 Intent intent = new Intent("com.aboutus");
                 startActivity(intent);
-
             }
         });
+
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        boolean display = Preference.getBoolean(ContextUtil.getAppContext(), Preference.KEY_DISPLAY);
+        boolean display = Preference.getBoolean(context, Preference.KEY_DISPLAY);
         if (display) {
-            YeLog.i("MainActivity:canDrawOverlays=" + Settings.canDrawOverlays(this));
-            if (!Settings.canDrawOverlays(App.getApp())) {
+            if (!Settings.canDrawOverlays(context)) {
 
                 new AlertDialog.Builder(this)
                         .setCancelable(false)
@@ -84,8 +83,17 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void onPause() {
+        super.onPause();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

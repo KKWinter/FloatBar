@@ -16,6 +16,8 @@ import android.view.animation.AccelerateInterpolator;
 
 import com.kkwinter.floatbar.utils.ContextUtil;
 import com.kkwinter.floatbar.utils.Preference;
+import com.kkwinter.floatbar.utils.Utils;
+import com.kkwinter.floatbar.utils.YeLog;
 
 @SuppressLint("ViewConstructor")
 public class TouchView extends android.support.v7.widget.AppCompatButton {

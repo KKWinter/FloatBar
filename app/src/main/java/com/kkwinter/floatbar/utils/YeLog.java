@@ -1,7 +1,9 @@
-package com.kkwinter.floatbar;
+package com.kkwinter.floatbar.utils;
 
 import android.support.annotation.Keep;
 import android.util.Log;
+
+import com.kkwinter.floatbar.BuildConfig;
 
 @Keep
 public class YeLog {

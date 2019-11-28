@@ -1,58 +1,53 @@
-package com.kkwinter.floatbar;
+package com.kkwinter.floatbar.utils;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
+import com.kkwinter.floatbar.R;
 
-/**
- * Created by jiantao.tu on 2018/9/20.
- */
+import java.io.File;
+import java.util.Objects;
+
 public class Utils {
+
     public static boolean isAccessibilitySettingsOn(Context mContext) {
         int accessibilityEnabled = 0;
         final String service = mContext.getPackageName() + "/" + ABCService.class.getCanonicalName();
         YeLog.i("Utils-isAccessibilitySettingsOn:service:" + service);
+
         try {
-            accessibilityEnabled = Settings.Secure.getInt(
-                    mContext.getApplicationContext().getContentResolver(),
-                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+            accessibilityEnabled = Settings.Secure.getInt(mContext.getApplicationContext().getContentResolver(), android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
             YeLog.i("Utils-isAccessibilitySettingsOn:accessibilityEnabled = " + accessibilityEnabled);
         } catch (Settings.SettingNotFoundException e) {
             YeLog.e("Utils-isAccessibilitySettingsOn:Error finding setting, default accessibility to not found: " + e.getMessage());
         }
-        TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(
-                ':');
+        TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
 
         if (accessibilityEnabled == 1) {
             YeLog.i("Utils-isAccessibilitySettingsOn:***ACCESSIBILITY IS ENABLED*** -----------------");
-            String settingValue = Settings.Secure.getString(
-                    mContext.getApplicationContext().getContentResolver(),
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            String settingValue = Settings.Secure.getString(mContext.getApplicationContext().getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
             if (settingValue != null) {
                 mStringColonSplitter.setString(settingValue);
                 while (mStringColonSplitter.hasNext()) {
                     String accessibilityService = mStringColonSplitter.next();
 
-                    YeLog.i("Utils-isAccessibilitySettingsOn:-------------- > accessibilityService :: " + accessibilityService + " " +
-                            service);
+                    YeLog.i("Utils-isAccessibilitySettingsOn:-------------- > accessibilityService :: " + accessibilityService + " " + service);
                     if (accessibilityService.equalsIgnoreCase(service)) {
                         YeLog.i("Utils-isAccessibilitySettingsOn:We've found the correct setting - accessibility is switched on!");
                         return true;
@@ -136,84 +131,71 @@ public class Utils {
     }
 
     /**
-     * 电源键【锁屏】
-     */
-
-    /**
      * 打开相机
      */
+    public static void takePhoto() {
+        PermissionActivity.launch(PermissionUtils.CODE_CAMERA);
+    }
 
     /**
+     * 返回键
+     * home键
+     * 锁屏
      * 截屏
      */
+    public static void performByABCService(final Context context, ABCService abcService, int eventType) {
 
-    /**
-     * 手电筒
-     */
+        if (!Utils.isAccessibilitySettingsOn(context)) {
 
-    /**
-     * isWifiOn: return获取的wifi的状态，true开启，false关闭
-     * changeWifiStatus： return改变之后的结果
-     */
-    public static boolean isWifiOn(Context context) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.Theme_AppCompat_Light_Dialog_Alert);
+            builder.setCancelable(false);
+            builder.setMessage("Please jump to system settings and activate accessibility server.");
+            builder.setPositiveButton("jump", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                }
+            });
 
-        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        /*
-         {@link #WIFI_STATE_DISABLED},   1
-         {@link #WIFI_STATE_DISABLING},  0
-         {@link #WIFI_STATE_ENABLED},    3
-         {@link #WIFI_STATE_ENABLING},   2
-         {@link #WIFI_STATE_UNKNOWN}     4
-         */
-        return wifiManager.getWifiState() == 3;
-    }
+            builder.setNegativeButton("cancel", null);
+            Dialog dialog = builder.create();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Objects.requireNonNull(dialog.getWindow()).setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+            } else {
+                Objects.requireNonNull(dialog.getWindow()).setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+            }
+            dialog.show();
 
-    public static boolean changeWifiStatus(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-
-        /*
-         android Q上被废弃
-         */
-        boolean result = wifiManager.getWifiState() == 3;
-        wifiManager.setWifiEnabled(!result);
-        return !result;
-    }
-
-
-    /**
-     * isBlueToothOn: return获取的蓝牙状态，true开启，false关闭
-     * changeBlueToothStatus: return改变之后的结果
-     */
-    public static boolean isBlueToothOn() {
-        BluetoothAdapter defaultAdapter = BluetoothAdapter.getDefaultAdapter();
-        return defaultAdapter.isEnabled();
-    }
-
-    public static boolean changeBlueToothStatus() {
-        BluetoothAdapter defaultAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (isBlueToothOn()) {
-            defaultAdapter.disable();
-            return false;
-        } else {
-            defaultAdapter.enable();
-            return true;
+            return;
         }
+
+        if (abcService != null) {
+            abcService.performGlobalAction(eventType);
+
+        }
+
     }
 
 
     /**
      * 飞行模式
      */
-    public static boolean isAirPlaneOn(Context context) {
+    public static boolean getAirPlaneState(Context context) {
         return Settings.System.getInt(context.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) == 1;
     }
 
 
-    public static void changeAirPlaneStatus(Context context) {
-        //在后台startActivity无效
-        Intent intent = new Intent("android.settings.AIRPLANE_MODE_SETTINGS");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+    public static void changeAirPlaneState(Context context) {
+        try {
+            // TODO: 2019-11-28  在小米设备上，后台startActivity无效； android 10上也会限制后台startActivity
+            Intent intent = new Intent("android.settings.AIRPLANE_MODE_SETTINGS");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

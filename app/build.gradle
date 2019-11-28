@@ -13,7 +13,7 @@ android {
     }
     defaultConfig {
         applicationId "com.kkwinter.floatbar"
-        minSdkVersion 23
+        minSdkVersion 28
         targetSdkVersion 28
         versionCode 3
         versionName "1.1.0"
